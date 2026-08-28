@@ -1,217 +1,139 @@
 import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-    faBars,
-    faXmark,
-    faGraduationCap,
-    faUser,
-    faRightFromBracket,
+  faBars,
+  faXmark,
+  faGraduationCap,
+  faUser,
+  faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
-// import { onAuthStateChanged, signOut } from "firebase/auth";
-// import { auth } from "../firebase/config";
-// import { useNavigate } from "react-router-dom";
 
-export default function Navbar() {
-    const [menuOpen, setMenuOpen] = useState(false);
-    const [scrolled, setScrolled] = useState(false);
+const Navbar = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [user, setUser] = useState(null);
 
-    // ---- Firebase Auth state (uncomment when firebase is wired up) ----
-    const [user, setUser] = useState(null); // { name, role: "admin" | "student" } | null
-    // const navigate = useNavigate();
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 8);
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+  const navLinks = [
+    { label: "Home", href: "/" },
+    { label: "Courses", href: "/courses" },
+    { label: "About", href: "/about" },
+    { label: "Contact", href: "/contact" },
+  ];
 
-    // useEffect(() => {
-    //   const unsub = onAuthStateChanged(auth, async (firebaseUser) => {
-    //     if (firebaseUser) {
-    //       // fetch role from Firestore "users" collection
-    //       setUser({ name: firebaseUser.displayName, role: "student" });
-    //     } else {
-    //       setUser(null);
-    //     }
-    //   });
-    //   return () => unsub();
-    // }, []);
+  return (
+    <header className="fixed top-0 left-0 w-full z-50 px-4 py-3">
+      
+      <div
+        className={`mx-auto max-w-7xl rounded-2xl bg-white/80 backdrop-blur-xl transition-all ${
+  scrolled ? "shadow-lg" : "shadow-md"
+}`}
+      >
+        <nav className="flex items-center justify-between px-4 py-3">
 
-    const handleLogout = () => {
-        // signOut(auth).then(() => navigate("/login"));
-        setUser(null);
-        setMenuOpen(false);
-    };
+          {/* Logo */}
+          <a href="/" className="flex items-center gap-2">
+            <div className="h-9 w-9 flex items-center justify-center rounded-xl bg-gradient-to-r from-violet-600 to-pink-500">
+              <FontAwesomeIcon icon={faGraduationCap} className="text-white" />
+            </div>
+            <span className="font-semibold text-lg text-black">EduPrime</span>
+          </a>
 
-    const navLinks = [
-        { label: "Home", href: "/" },
-        { label: "Courses", href: "/courses" },
-        { label: "About", href: "/about" },
-        { label: "Contact", href: "/contact" },
-    ];
+          {/* Desktop Menu */}
+          <ul className="hidden md:flex items-center gap-4">
+            {navLinks.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  className="text-sm font-medium text-gray-700 hover:text-black"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
 
-    return (
-        <div className="fixed inset-x-0 top-0 z-50" style={{ padding: "10px" }}>
-            <header
-                className={`fixed top-5 left-20 right-20 mx-auto rounded-2xl border border-white/40 bg-white/50 backdrop-blur-xl transition-shadow ${scrolled
-                        ? "shadow-[0_8px_32px_rgba(124,58,237,0.15)]"
-                        : "shadow-[0_4px_20px_rgba(0,0,0,0.06)]"
-                    }`}
-                style={{
-                    backdropFilter: "blur(20px) saturate(180%)",
-                    WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                }}
-            >
-                <nav className="flex items-center justify-between px-4 py-3 sm:px-6">
-                    {/* Logo */}
-                    <a href="/" className="flex items-center gap-2">
-                        <div
-                            className="flex h-9 w-9 items-center justify-center rounded-xl"
-                            style={{ background: "linear-gradient(135deg, #7c3aed, #d946ef)" }}
-                        >
-                            <FontAwesomeIcon icon={faGraduationCap} style={{ color: "#ffffff", fontSize: "18px" }} />
-                        </div>
-                        <span
-                            style={{ fontFamily: "Poppins, sans-serif" }}
-                            className="text-lg font-semibold tracking-tight text-black"
-                        >
-                            EduPrime
-                        </span>
-                    </a>
+          {/* Right Side */}
+          <div className="hidden md:flex items-center gap-3">
+            {user ? (
+              <>
+                <button className="px-4 py-2 rounded-full border">
+                  Dashboard
+                </button>
+                <button className="px-4 py-2 rounded-full bg-gradient-to-r from-violet-600 to-pink-500 text-white">
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <a href="/login" className="text-sm">Login</a>
+                <a
+                  href="/logout"
+                  className="px-4 py-2 rounded-full bg-gradient-to-r from-violet-600 to-pink-500 text-white text-sm"
+                >
+                  Logout
+                </a>
+              </>
+            )}
+          </div>
 
-                    {/* Desktop nav links */}
-                    <ul
-                        style={{ fontFamily: "Inter, sans-serif" }}
-                        className="hidden items-center gap-1 rounded-full bg-white/40 p-1 md:flex"
-                    >
-                        {navLinks.map((link) => (
-                            <li key={link.href}>
-                                <a
-                                    href={link.href}
-                                    className="block rounded-full px-4 py-2 text-sm font-medium text-black/70 transition-colors hover:bg-white/70 hover:text-black"
-                                >
-                                    {link.label}
-                                </a>
-                            </li>
-                        ))}
-                    </ul>
+          {/* Mobile Toggle */}
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="md:hidden text-black"
+          >
+            <FontAwesomeIcon icon={menuOpen ? faXmark : faBars} size="lg" />
+          </button>
+        </nav>
 
-                    {/* Right side: auth buttons (desktop) */}
-                    <div
-                        style={{ fontFamily: "Inter, sans-serif" }}
-                        className="hidden items-center gap-3 md:flex"
-                    >
-                        {user ? (
-                            <>
-                                <a
-                                    href={user.role === "admin" ? "/admin" : "/dashboard"}
-                                    className="flex items-center gap-2 rounded-full border border-white/60 bg-white/50 px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-white/80"
-                                >
-                                    <FontAwesomeIcon icon={faUser} style={{ fontSize: "16px" }} />
-                                    {user.role === "admin" ? "Admin Panel" : "My Dashboard"}
-                                </a>
-                                <button
-                                    onClick={handleLogout}
-                                    className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
-                                    style={{ background: "linear-gradient(135deg, #7c3aed, #d946ef)" }}
-                                >
-                                    <FontAwesomeIcon icon={faRightFromBracket} style={{ fontSize: "16px" }} />
-                                    Logout
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <a
-                                    href="/login"
-                                    className="rounded-full px-4 py-2 text-sm font-medium text-black transition-colors hover:bg-white/60"
-                                >
-                                    Login
-                                </a>
-                                <a
-                                    href="/signup"
-                                    className="rounded-full px-5 py-2 text-sm font-medium text-white shadow-md transition-opacity hover:opacity-90"
-                                    style={{ background: "linear-gradient(135deg, #7c3aed, #ec4899)" }}
-                                >
-                                    Sign Up
-                                </a>
-                            </>
-                        )}
-                    </div>
+        {/* Mobile Menu */}
+        {menuOpen && (
+          <div className="md:hidden px-4 pb-4">
+            <ul className="flex flex-col gap-3">
+              {navLinks.map((link) => (
+                <li key={link.href}>
+                  <a
+                    href={link.href}
+                    onClick={() => setMenuOpen(false)}
+                    className="block text-gray-700 py-2 border-b"
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
 
-                    {/* Mobile menu toggle */}
-                    <button
-                        onClick={() => setMenuOpen((prev) => !prev)}
-                        className="flex h-9 w-9 items-center justify-center rounded-full bg-white/50 text-black md:hidden"
-                        aria-label="Toggle menu"
-                    >
-                        <FontAwesomeIcon icon={menuOpen ? faXmark : faBars} style={{ fontSize: "20px" }} />
-                    </button>
-                </nav>
+            <div className="mt-4 flex flex-col gap-2">
+              {user ? (
+                <>
+                  <button className="py-2 border rounded-full">
+                    Dashboard
+                  </button>
+                  <button className="py-2 rounded-full bg-gradient-to-r from-violet-600 to-pink-500 text-white">
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="py-2 text-center border rounded-full">
+                    Login
+                  </Link>
+                  <Link to="/logout" className="py-2 text-center rounded-full bg-gradient-to-r from-violet-600 to-pink-500 text-white">
+                    Logout
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+};
 
-                {/* Mobile menu panel */}
-                {menuOpen && (
-                    <div
-                        style={{
-                            fontFamily: "Inter, sans-serif",
-                            backdropFilter: "blur(20px) saturate(180%)",
-                            WebkitBackdropFilter: "blur(20px) saturate(180%)",
-                        }}
-                        className="mx-3 mb-3 rounded-xl border border-white/40 bg-white/60 px-3 pb-4 pt-2 md:hidden"
-                    >
-                        <ul className="flex flex-col gap-1">
-                            {navLinks.map((link) => (
-                                <li key={link.href}>
-                                    <a
-                                        href={link.href}
-                                        onClick={() => setMenuOpen(false)}
-                                        className="block rounded-lg px-3 py-3 text-base font-medium text-black/80 hover:bg-white/70"
-                                    >
-                                        {link.label}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-
-                        <div className="mt-3 flex flex-col gap-2 border-t border-white/50 pt-3">
-                            {user ? (
-                                <>
-                                    <a
-                                        href={user.role === "admin" ? "/admin" : "/dashboard"}
-                                        className="flex items-center justify-center gap-2 rounded-full border border-white/60 bg-white/50 px-4 py-3 text-sm font-medium text-black"
-                                    >
-                                        <FontAwesomeIcon icon={faUser} style={{ fontSize: "16px" }} />
-                                        {user.role === "admin" ? "Admin Panel" : "My Dashboard"}
-                                    </a>
-                                    <button
-                                        onClick={handleLogout}
-                                        className="flex items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-medium text-white"
-                                        style={{ background: "linear-gradient(135deg, #7c3aed, #d946ef)" }}
-                                    >
-                                        <FontAwesomeIcon icon={faRightFromBracket} style={{ fontSize: "16px" }} />
-                                        Logout
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    <a
-                                        href="/login"
-                                        className="rounded-full border border-black/60 bg-white/40 px-4 py-3 text-center text-sm font-medium text-black"
-                                    >
-                                        Login
-                                    </a>
-                                    <a
-                                        href="/signup"
-                                        className="rounded-full px-4 py-3 text-center text-sm font-medium text-white"
-                                        style={{ background: "linear-gradient(135deg, #7c3aed, #ec4899)" }}
-                                    >
-                                        Sign Up
-                                    </a>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                )}
-            </header>
-        </div>
-    );
-}
+export default Navbar;
